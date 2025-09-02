@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sensor Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #66a5e4;
+      color: #333;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .dashboard {
+      background: rgb(133, 202, 115);
+      padding: 2rem 3rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      width: 320px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 1.5rem;
+      color: #cc0044;
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+
+    .sensor {
+      background: #e9f1fc;
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 1.1rem;
+      box-shadow: inset 0 0 8px #d0e4fc;
+    }
+
+    .sensor span.label {
+      font-weight: 600;
+      color: #005a9e;
+    }
+
+    .sensor span.value {
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: #003d66;
+      min-width: 60px;
+      text-align: right;
+    }
+
+    /* Optional: subtle animation when values update */
+    .sensor span.value.update {
+      animation: pulse 0.5s ease-out;
+    }
+
+    @keyframes pulse {
+      0% {
+        background-color: #cce4ff;
+        border-radius: 4px;
+      }
+      100% {
+        background-color: transparent;
+      }
+    }
+  </style>
+
+  <script>
+    let ws = new WebSocket("ws://" + location.hostname + ":81/");
+    ws.onmessage = function (event) {
+      let data = JSON.parse(event.data);
+
+      const updateValue = (id, value, unit = "") => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const newValue = id.match(/^f/) ? value.toFixed(2) : value;
+        if (el.innerText !== newValue + unit) {
+          el.innerText = newValue + unit;
+          el.classList.add("update");
+          setTimeout(() => el.classList.remove("update"), 500);
+        }
+      };
+
+      updateValue("f1", data.s1, " °C");
+      updateValue("f2", data.s2, " %");
+      updateValue("s3", data.s3, "");
+      updateValue("s4", data.s4, "");
+    };
+  </script>
+</head>
+<body>
+  <div class="dashboard">
+    <h2>Live Sensor Data</h2>
+    <div class="sensor">
+      <span class="label">Temperature</span>
+      <span id="f1" class="value">-- °C</span>
+    </div>
+    <div class="sensor">
+      <span class="label">Humidity</span>
+      <span id="f2" class="value">-- %</span>
+    </div>
+    <div class="sensor">
+      <span class="label">Light Level</span>
+      <span id="s3" class="value">--</span>
+    </div>
+    <div class="sensor">
+      <span class="label">Source</span>
+      <span id="s4" class="value">--</span>
+    </div>
+  </div>
+</body>
+</html>
