@@ -4,6 +4,7 @@
 #include <WebServer.h>
 #include <HTTPClient.h>
 #include <Wait2.h>
+#include <LittleFS.h>
 
 const char* ssid = "PHD1 2.4";
 const char* password = "Andrew1Laura2";
@@ -226,8 +227,34 @@ void setup() {
 
    Serial.println(WiFi.localIP());
 
-  server.on("/", HTTP_GET, []() {
-    server.send(200, "text/html", htmlPage);
+//  server.on("/", HTTP_GET, []() {
+//    server.send(200, "text/html", htmlPage);
+
+if (!LITTLEFS.begin()) {
+    Serial.println("LITTLEFS mount failed! Formatting...");
+    if (LITTLEFS.format()) {
+      Serial.println("Formatting successful! Trying to mount again...");
+      if (LITTLEFS.begin()) {
+        Serial.println("LittleFS mounted after formatting");
+      } else {
+        Serial.println("Mount failed even after formatting");
+      }
+    } else {
+      Serial.println("Formatting failed");
+    }
+  } else {
+    Serial.println("LittleFS mounted successfully");
+  }
+
+
+
+
+
+server.on("/", HTTP_GET, []() {
+ File file = LITTLEFS.open("/index.html", "r");
+server.streamFile(file, "text/html");
+file.close();
+
   });
 
 
