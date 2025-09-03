@@ -3,3 +3,5 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+server_files/config_keys/config.php
+server_files/config_keys/ConfigPlacement.txt
