@@ -5,11 +5,16 @@
 #include <HTTPClient.h>
 #include <Wait2.h>
 #include <LittleFS.h>
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME280.h>
 
 const char* ssid = "PHD1 2.4";
 const char* password = "Andrew1Laura2";
 const String apiUrl = "http://adamnet.ca/arduino/log2/log.php"; // API URL to log data to MySQL
 
+Adafruit_BME280 bme;
+#define BME_ADDR 0x76
 
 WebServer server(80);
 WebSocketsServer webSocket = WebSocketsServer(81);  // WebSocket port
@@ -44,8 +49,12 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
 
 // Function to generate random data for temp, hum, and light
 void generateRandomData() {
-  temp = random(180, 300) / 10.000; // Random temperature between 18.0 and 30.0°C
-  hum = random(300, 800) / 10.000; // Random humidity between 30.0 and 80.0%
+ // temp = random(180, 300) / 10.000; // Random temperature between 18.0 and 30.0°C
+//  hum = random(300, 800) / 10.000; // Random humidity between 30.0 and 80.0%
+
+temp = bme.readTemperature();    // °C
+hum   = bme.readHumidity();       // %
+
   light = random(0, 1024); // Random light intensity between 0 and 1023
   source = 999; // Hardcoded source name
   Serial.print("Generated data: Temp = ");
@@ -87,6 +96,8 @@ void logToMySQL(float temp, float hum, int light, String source) {
 void setup() {
   Serial.begin(9600);
   delay(1000);
+
+bme.begin(BME_ADDR);
 
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
