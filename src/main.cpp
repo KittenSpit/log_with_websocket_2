@@ -19,8 +19,8 @@ Adafruit_BME280 bme;
 WebServer server(80);
 WebSocketsServer webSocket = WebSocketsServer(81);  // WebSocket port
 
- //1000 millis = 1 second
-Wait2 delay1 (30000); 
+ //1000 millis = 1 second 300,000 = 5 minutes
+Wait2 delay1 (300000); 
 
 
 // Variable to store incoming data
@@ -49,7 +49,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
 
 // Function to generate random data for temp, hum, and light
 void generateRandomData() {
- // temp = random(180, 300) / 10.000; // Random temperature between 18.0 and 30.0°C
+//  temp = random(180, 300) / 10.000; // Random temperature between 18.0 and 30.0°C
 //  hum = random(300, 800) / 10.000; // Random humidity between 30.0 and 80.0%
 
 temp = bme.readTemperature();    // °C
