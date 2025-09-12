@@ -4,11 +4,11 @@
 #include <WebServer.h>
 #include <HTTPClient.h>
 #include <Wait2.h>
-#include <LittleFS.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
-
+#include "FS.h"
+#include <LittleFS.h>
 const char* ssid = "PHD1 2.4";
 const char* password = "Andrew1Laura2";
 const String apiUrl = "http://adamnet.ca/arduino/log2/log.php"; // API URL to log data to MySQL
@@ -110,11 +110,11 @@ bme.begin(BME_ADDR);
    Serial.println(WiFi.localIP());
 
 
-if (!LITTLEFS.begin()) {
+if (!LittleFS.begin()) {
     Serial.println("LITTLEFS mount failed! Formatting...");
-    if (LITTLEFS.format()) {
+    if (LittleFS.format()) {
       Serial.println("Formatting successful! Trying to mount again...");
-      if (LITTLEFS.begin()) {
+      if (LittleFS.begin()) {
         Serial.println("LittleFS mounted after formatting");
       } else {
         Serial.println("Mount failed even after formatting");
@@ -127,7 +127,7 @@ if (!LITTLEFS.begin()) {
   }
   //read webpage from LittleFS
   server.on("/", HTTP_GET, []() {
-  File file = LITTLEFS.open("/index.html", "r");
+  File file = LittleFS.open("/index.html", "r");
   server.streamFile(file, "text/html");
   file.close();
   });
